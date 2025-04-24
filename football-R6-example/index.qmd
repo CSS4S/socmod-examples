@@ -1,48 +1,55 @@
+---
+editor: 
+  markdown: 
+    wrap: 72
+---
+
 # Football (soccer) example of object-oriented programming in R6
 
-R6 provides the sort of object-oriented programming capabilities that closely
-resemble the class system in Python or Julia, and to a somewhat lesser extent
-Java, C++, and other compiled languages that natively support object-oriented
-programming. 
+R6 provides the sort of object-oriented programming capabilities that
+closely resemble the class system in Python or Julia, and to a somewhat
+lesser extent Java, C++, and other compiled languages that natively
+support object-oriented programming.
 
 This football/soccer example is intended as a gentle, fun introduction
-to object-oriented programming in R using the R6 library. Beginners will learn
-the basic concepts of object-oriented programming, including what a *class* is
-and how to use it to represent the state, behaviors, capacities, and
-susceptibilities of real-world entities: here we model soccer players, their
-teams, and soccer match gameplay.
+to object-oriented programming in R using the R6 library. Beginners will
+learn the basic concepts of object-oriented programming, including what
+a *class* is and how to use it to represent the state, behaviors,
+capacities, and susceptibilities of real-world entities: here we model
+soccer players, their teams, and soccer match gameplay.
 
-After the demonstration the reader can get more practice with R6 and classes by
-following the exercises below. These prompt the reader to expand model football
-gameplay by having players get penalties, making the penalties matter for the
-final score, and inventing their own classes to represent some other system of
-interest within their research program, personal hobbies, or something else.
+After the demonstration the reader can get more practice with R6 and
+classes by following the exercises below. These prompt the reader to
+expand model football gameplay by having players get penalties, making
+the penalties matter for the final score, and inventing their own
+classes to represent some other system of interest within their research
+program, personal hobbies, or something else.
 
-Follow the demonstration below and study the code in the files below to learn
-how *object-oriented programming* is used to represent entities in the world and
-their behaviors. `socmod` uses 
-
+Follow the demonstration below and study the code in the files below to
+learn how *object-oriented programming* is used to represent entities in
+the world and their behaviors. `socmod` uses
 
 ## Project structure
 
-We load and use R code contained in the `R/` directory of this example project.
- There we have the following files:
+We load and use R code contained in the [`R/` directory of this example
+project](https://github.com/CSS4S/socmod-examples/tree/main/football-R6-example/R).
+There we have the following files:
 
-- `R/footballer.R` – defines the Footballer class, i.e., soccer player.
-- `R/team.R` – defines the Team class, which "contains" players.
-- `R/play_match.R` – defines the `play_match(team1, team2)` function.
+-   `R/footballer.R` – defines the Footballer class, i.e., soccer player
+-   `R/team.R` – defines the Team class, which "contains" players.
+-   `R/play_match.R` – defines the `play_match(team1, team2)` function.
 
-It's common to separate the R code that defines each class into separate files,
-and separate any functions that relate to one type or the other, or functions
-that use multiple types defined across disparate files.
+It's common to separate the R code that defines each class into separate
+files, and separate any functions that relate to one type or the other,
+or functions that use multiple types defined across disparate files.
 
 ## Football example
 
-We load code in R using the `source` command, which we'll use now to load the
-code in the listed files. In each of the following blocks we load one of the
-files, then use some code from there to demonstrate it's working. Following
-these three blocks is an example of a three-game series between two teams, the
-Whales and the Squirrels.
+We load code in R using the `source` command, which we'll use now to
+load the code in the listed files. In each of the following blocks we
+load one of the files, then use some code from there to demonstrate it's
+working. Following these three blocks is an example of a three-game
+series between two teams, the Whales and the Squirrels.
 
 ```{r}
 source("R/footballer.R")
@@ -79,8 +86,8 @@ play_match(team, team)
 
 ### Whales vs. Squirrels
 
-Initialize two teams, Whales and Squirrels, each with two players. 
-All players have identical default attributes.
+Initialize two teams, Whales and Squirrels, each with two players. All
+players have identical default attributes.
 
 ```{r}
 whales <- Team$new(
@@ -103,41 +110,47 @@ cat("\nAfter three games...", "\nThe Whales have won",
 ```
 
 When modeling social behavior in professional contexts, our closing
-paragraphs always include a meditation about the limitations of our model. 
-In one sense it's by design that our model assumptions do not
-exactly match the real world: the goals of our science is not realism but rigor.
-However, alternative, potentially equally justifiable, assumptions about 
-social behavior may lead to different model outcomes. This exercise often
-identifies opportunities for future research that more thoroughly tests
-different combinations of assumptions that are empirically and practically
-important.
+paragraphs always include a meditation about the limitations of our
+model. In one sense it's by design that our model assumptions do not
+exactly match the real world: the goals of our science is not realism
+but rigor. However, alternative, potentially equally justifiable,
+assumptions about social behavior may lead to different model outcomes.
+This exercise often identifies opportunities for future research that
+more thoroughly tests different combinations of assumptions that are
+empirically and practically important.
 
-In our toy example of a football match, where we created our own software
-representations of teams and players, we made serious simplifications, but
-nonetheless could observe outcomes that somewhat resembled the real world: the
-teams won, lost, and tied, and we tracked their records over a three-game
-series. 
+In our toy example of a football match, where we created our own
+software representations of teams and players, we made serious
+simplifications, but nonetheless could observe outcomes that somewhat
+resembled the real world: the teams won, lost, and tied, and we tracked
+their records over a three-game series.
 
 We left out features of gameplay and personnel management that could be
-interesting to include in future iterations of the model. We did not include
-penalties. We did not differentiate shots on goal versus errant shots. 
-
+interesting to include in future iterations of the model. We did not
+include penalties. We did not differentiate shots on goal versus errant
+shots.
 
 ## Exercises
 
-1. Update the code to model penalties and their consequences. Possible
-approaches include:
-  - Iterate through all agents to see if they get penalties like with scoring.
-  - Possible consequences:
-    - A player from the opposing team gets a penalty kick
-    - The player gets removed from contributing to the game
-2. Add personnel management, perhaps in the form of:
-  - A college draft process where teams add players to their roster with fixed
-    salary
-  - A `Team$release_player()` method to let players go, would pair with
+1.  Update the code to model penalties and their consequences. Possible
+    approaches include:
+
+-   Iterate through all agents to see if they get penalties like with
+    scoring.
+-   Possible consequences:
+    -   A player from the opposing team gets a penalty kick
+    -   The player gets removed from contributing to the game
+
+2.  Add personnel management, perhaps in the form of:
+
+-   A college draft process where teams add players to their roster with
+    fixed salary
+-   A `Team$release_player()` method to let players go, would pair with
     `$sign_player()`
-  - A function for teams to trade players, e.g., `trade(team1, player1, team2, player2)`
-3. Add a `Season` class to schedule and run matches (i.e., with `play_match`), 
-track and summarise standings, etc.
-4. A similar `Tournament` class or function to represent elimination-style
-    tournaments.
+-   A function for teams to trade players, e.g.,
+    `trade(team1, player1, team2, player2)`
+
+3.  Add a `Season` class to schedule and run matches (i.e., with
+    `play_match`), track and summarise standings, etc.
+4.  A similar `Tournament` class or function to represent
+    elimination-style tournaments.

@@ -1,0 +1,15 @@
+# `socmod` examples
+
+This website is a way to deliver examples of the `socmod` library and related concepts.
+
+## Index
+
+-   [Football/soccer example](football-R6-example/index.qmd) that illustrates how to use the [R6 library](https://github.com/r-lib/R6) for object-oriented programming. Understanding object-oriented programming concepts will help design agent-based models of social behavior, and is a key component in the design of `socmod`.
+
+#### Planned
+
+-   Simple diffusion of adaptive behaviors with different learning strategies
+
+-   Medici solar panel business opportunity
+
+-   A sipmlified version of Turner et al 2023

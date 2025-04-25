@@ -1,6 +1,6 @@
-# `socmod` examples
+# socmod examples
 
-This website is a way to deliver examples of the `socmod` library and related concepts.
+This website is a way to deliver examples of the [socmod](https://css4s.github.io/socmod) library and related concepts.
 
 ## Index
 

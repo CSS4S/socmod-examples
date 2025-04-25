@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Matt Turner">
 
-<title>index – `socmod` examples</title>
+<title>Football (soccer) example of object-oriented programming in R6 – socmod examples</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -115,7 +116,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="../index.html">
-    <span class="navbar-title"><code>socmod</code> examples</span>
+    <span class="navbar-title">socmod examples</span>
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -144,26 +145,43 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#football-soccer-example-of-object-oriented-programming-in-r6" id="toc-football-soccer-example-of-object-oriented-programming-in-r6" class="nav-link active" data-scroll-target="#football-soccer-example-of-object-oriented-programming-in-r6">Football (soccer) example of object-oriented programming in R6</a>
-  <ul class="collapse">
-  <li><a href="#project-structure" id="toc-project-structure" class="nav-link" data-scroll-target="#project-structure">Project structure</a></li>
+  <li><a href="#project-structure" id="toc-project-structure" class="nav-link active" data-scroll-target="#project-structure">Project structure</a></li>
   <li><a href="#football-example" id="toc-football-example" class="nav-link" data-scroll-target="#football-example">Football example</a>
   <ul class="collapse">
   <li><a href="#whales-vs.-squirrels" id="toc-whales-vs.-squirrels" class="nav-link" data-scroll-target="#whales-vs.-squirrels">Whales vs.&nbsp;Squirrels</a></li>
   </ul></li>
   <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
-  </ul></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Football (soccer) example of object-oriented programming in R6</h1>
+</div>
 
 
 
+<div class="quarto-title-meta">
 
-<section id="football-soccer-example-of-object-oriented-programming-in-r6" class="level1">
-<h1>Football (soccer) example of object-oriented programming in R6</h1>
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Matt Turner </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
 <p>R6 provides the sort of object-oriented programming capabilities that closely resemble the class system in Python or Julia, and to a somewhat lesser extent Java, C++, and other compiled languages that natively support object-oriented programming.</p>
 <p>This football/soccer example is intended as a gentle, fun introduction to object-oriented programming in R using the R6 library. Beginners will learn the basic concepts of object-oriented programming, including what a <em>class</em> is and how to use it to represent the state, behaviors, capacities, and susceptibilities of real-world entities: here we model soccer players, their teams, and soccer match gameplay.</p>
 <p>After the demonstration the reader can get more practice with R6 and classes by following the exercises below. These prompt the reader to expand model football gameplay by having players get penalties, making the penalties matter for the final score, and inventing their own classes to represent some other system of interest within their research program, personal hobbies, or something else.</p>
@@ -215,7 +233,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">play_match</span>(team, team)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Bay FC wins!!!
-Bay FC :  4     Bay FC :  3 </code></pre>
+Bay FC :  3     Bay FC :  4 </code></pre>
 </div>
 </div>
 <section id="whales-vs.-squirrels" class="level3">
@@ -234,18 +252,18 @@ Bay FC :  4     Bay FC :  3 </code></pre>
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Play three matches.</span></span>
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="fu">play_match</span>(whales, squirrels)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Squirrels wins!!!
-Whales :  2     Squirrels :  6 </code></pre>
+<pre><code>Whales wins!!!
+Whales :  5     Squirrels :  2 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">play_match</span>(squirrels, whales)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Squirrels wins!!!
-Squirrels :  6     Whales :  3 </code></pre>
+Squirrels :  5     Whales :  2 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">play_match</span>(squirrels, whales)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Whales wins!!!
-Squirrels :  1     Whales :  5 </code></pre>
+Squirrels :  2     Whales :  5 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Print how many games each time won.</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">After three games..."</span>, <span class="st">"</span><span class="sc">\n</span><span class="st">The Whales have won"</span>, </span>
@@ -253,7 +271,7 @@ Squirrels :  1     Whales :  5 </code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 After three games... 
-The Whales have won 1 games and the Squirrels have won 2</code></pre>
+The Whales have won 2 games and the Squirrels have won 1</code></pre>
 </div>
 </div>
 <p>When modeling social behavior in professional contexts, our closing paragraphs always include a meditation about the limitations of our model. In one sense it’s by design that our model assumptions do not exactly match the real world: the goals of our science is not realism but rigor. However, alternative, potentially equally justifiable, assumptions about social behavior may lead to different model outcomes. This exercise often identifies opportunities for future research that more thoroughly tests different combinations of assumptions that are empirically and practically important.</p>
@@ -270,8 +288,8 @@ The Whales have won 1 games and the Squirrels have won 2</code></pre>
 <li>Iterate through all agents to see if they get penalties like with scoring.</li>
 <li>Possible consequences:
 <ul>
-<li>A player from the opposing team gets a penalty kick</li>
-<li>The player gets removed from contributing to the game</li>
+<li><p>A player from the opposing team gets a penalty kick</p></li>
+<li><p>The player gets removed from contributing to the game</p></li>
 </ul></li>
 </ul>
 <ol start="2" type="1">
@@ -288,7 +306,6 @@ The Whales have won 1 games and the Squirrels have won 2</code></pre>
 </ol>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->

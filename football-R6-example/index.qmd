@@ -2,9 +2,9 @@
 editor: 
   markdown: 
     wrap: 72
+author: Matt Turner
+title: "Football (soccer) example of object-oriented programming in R6"
 ---
-
-# Football (soccer) example of object-oriented programming in R6
 
 R6 provides the sort of object-oriented programming capabilities that
 closely resemble the class system in Python or Julia, and to a somewhat
@@ -139,6 +139,7 @@ shots.
     scoring.
 -   Possible consequences:
     -   A player from the opposing team gets a penalty kick
+
     -   The player gets removed from contributing to the game
 
 2.  Add personnel management, perhaps in the form of:

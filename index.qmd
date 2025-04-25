@@ -12,4 +12,4 @@ This website is a way to deliver examples of the `socmod` library and related co
 
 -   Medici solar panel business opportunity
 
--   A sipmlified version of Turner et al 2023
+-   A simplified version of Turner et al 2023

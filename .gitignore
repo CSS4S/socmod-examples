@@ -1,3 +1,5 @@
 /.quarto/
 .Rproj.user
 _site
+/.quarto/
+/_site/

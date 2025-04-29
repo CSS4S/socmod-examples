@@ -4,12 +4,13 @@ editor:
     wrap: 72
 author: Matt Turner
 title: "Football (soccer) example of object-oriented programming in R6"
+bibliography: "/Users/mt/workspace/Writing/library.bib"
 ---
 
 R6 provides the sort of object-oriented programming capabilities that
-closely resemble the class system in Python or Julia, and to a somewhat
-lesser extent Java, C++, and other compiled languages that natively
-support object-oriented programming.
+closely resemble the class system in Python or Julia and, to a lesser
+extent, Java, C++, and other compiled languages that natively support
+object-oriented programming.
 
 This football/soccer example is intended as a gentle, fun introduction
 to object-oriented programming in R using the R6 library. Beginners will
@@ -22,12 +23,12 @@ After the demonstration the reader can get more practice with R6 and
 classes by following the exercises below. These prompt the reader to
 expand model football gameplay by having players get penalties, making
 the penalties matter for the final score, and inventing their own
-classes to represent some other system of interest within their research
-program, personal hobbies, or something else.
+classes to represent some other ecological process like forest systems
+in a watershed.
 
 Follow the demonstration below and study the code in the files below to
 learn how *object-oriented programming* is used to represent entities in
-the world and their behaviors. `socmod` uses
+the world and their behaviors.
 
 ## Project structure
 
@@ -155,3 +156,12 @@ shots.
     `play_match`), track and summarise standings, etc.
 4.  A similar `Tournament` class or function to represent
     elimination-style tournaments.
+5.  Create an agent-based analysis of an ecological system, e.g., a
+    watershed, its forests, and trees in the forest. The various spatial
+    scales provide a natural class hierarchy: a watershed contains
+    several forests, each of which contain several trees. The
+    watershed's state, e.g., rainfall, temperature, snow cover, etc.,
+    affects and is affected by the individual trees. These effects could
+    be mediated by forest-level variables like tree density and species
+    distribution. @Grimm2005, for example, review some real-world
+    agent-based models of European beech forests.

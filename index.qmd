@@ -1,10 +1,10 @@
 # socmod examples
 
-This website is a way to deliver examples of the [socmod](https://css4s.github.io/socmod) library and related concepts.
+Examples demonstrating how to use the [socmod](https://css4s.github.io/socmod) library for modeling social behavior. The library could possibly be used for computational modeling in other fields like ecology and perhaps biology more broadly.
 
 ## Index
 
--   [Football/soccer example](football-R6-example/index.qmd) that illustrates how to use the [R6 library](https://github.com/r-lib/R6) for object-oriented programming. Understanding object-oriented programming concepts will help design agent-based models of social behavior, and is a key component in the design of `socmod`.
+-   [**Football/soccer example**](football-R6-example/index.qmd) that illustrates how to use the [R6 library](https://github.com/r-lib/R6) for object-oriented programming. Understanding object-oriented programming concepts will help design agent-based models of social behavior, and is a key component in the design of `socmod`.
 
 #### Planned
 

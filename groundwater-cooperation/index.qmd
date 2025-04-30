@@ -1,0 +1,11 @@
+---
+editor: 
+  markdown: 
+    wrap: 72
+author: Matt Turner
+title: "Groundwater conservation cooperation"
+bibliography: /Users/mt/workspace/Writing/library.bib
+---
+
+In cooperation, payoffs are maximized 
+

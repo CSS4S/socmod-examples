@@ -6,6 +6,8 @@ Examples demonstrating how to use the [socmod](https://css4s.github.io/socmod) l
 
 -   [**Football/soccer example**](football-R6-example/index.qmd) that illustrates how to use the [R6 library](https://github.com/r-lib/R6) for object-oriented programming. Understanding object-oriented programming concepts will help design agent-based models of social behavior, and is a key component in the design of `socmod`.
 
+- Minority-majority group structured diffusion a la [@Turner2023]
+
 #### Planned
 
 -   Simple diffusion of adaptive behaviors with different learning strategies

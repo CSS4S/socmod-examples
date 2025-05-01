@@ -17,7 +17,9 @@ years.
 
 Communities tend to have distinguishable groups if you look close enough. If this *group structure* does not affect the diffusion of adaptations, we would probably leave it out to focus on other more significant factors. However, the South Pacific Island case presents an important example of when it is important to include this group structure. 
 
-*Group structure*, in the South Pacific Islands case and in general, defined by the size of each group and how frequently groups interact with others from *within* their own group or *between* groups. These frequencies are set by the *homophily* of each group, which measures how much more frequent within-group versus between-group interactions are. Homophily arises due to personal *choice*, called *choice homophily*, or involuntarily due to circumstance, called *induced homophily* [@Kossinets2009]. If you like a certain type of food, and you go to a restaurant that serves that food, your preference for that food leads you to encounter others with similar taste, an instance of *choice homophily*. For some demographic group divisions, such as socio-economic status and race, homophily is heavily induced by, for example, historical legal and other obstacles to home ownership and other economic opportunity that led to economically and racially segregated neighborhoods, even after "segregation" became illegal. In these cases, *induced homophily* would dominate, say, in explaining why certain people of certain races tend to be geographically co-located, i.e., geographically *assorted*, since we can assume that for most people this was not a conscious choice.
+*Group structure*, in the South Pacific Islands case and in general, defined by the size of each group and how frequently groups interact with others from *within* their own group or *between* groups. These frequencies are set by the *homophily* of each group, which measures how much more frequent within-group versus between-group interactions are. Homophily arises due to personal *choice*, called *choice homophily*, or involuntarily due to circumstance, called *induced homophily* [@Kossinets2009]. If you like a certain type of food, and you go to a restaurant that serves that food, your preference for that food leads you to encounter others with similar taste, an instance of *choice homophily*. 
+
+For some demographic group divisions, such as socio-economic status and race, homophily is heavily induced by, for example, historical legal and other obstacles to home ownership and other economic opportunity that led to economically and racially segregated neighborhoods, even after "segregation" became illegal. In these cases, *induced homophily* would dominate, say, in explaining why certain people of certain races tend to be geographically co-located, i.e., geographically *assorted*, since we can assume that for most people this was not a conscious choice.
 
 In the models in this example we do not distinguish between types of homophily. They *are* important to distinguish when we go to interpret our models in real-world situations. Interpreting results like this can help guide real-world measurements of homophily by guiding researcher intuition for which measurements may the most significant.
 
@@ -30,8 +32,15 @@ be promoted by harnessing minority knowledge of adaptive behaviors at the outset
 of some hypothetical intervention, while majority groups could support
 adaptation by rapid spread in tight-knit communities [@Turner2023]. 
 
-This is just one of many possible formulations of a model of adaptation diffusion in homophilous networks. Here I demonstrate adaptation diffusion modeling with homophily network models in a somewhat simplified form, which we can call **_structured mixing_ with _symmetric homophily_**. Structured mixing does not use a social network. Instead, one agent is selected at random from one group or the other. Agents select a group at random to learn from, weighted by the symmetric homophily, i.e., the global homophily, identical for each group (@eq-homophily-ingroup-probability).
+This is just one of many possible formulations of a model of adaptation diffusion in homophilous networks. Here I demonstrate adaptation diffusion modeling with 
+homophily network models in a somewhat simplified form, which we can call 
+**_structured mixing_ with _symmetric homophily_**. Structured mixing does not use a social network. Instead, one agent is selected at random from one group or the other. Agents select a group at random to learn from, weighted by the symmetric homophily, i.e., the global homophily, identical for each group:
 
+$$
+\Pr(\text{Agent learns within group}) = \frac{1 + h}{2}
+$$
+
+The probability the agent learns from an outgroup is just the complement of this. In this setup there is only one outgroup.
 
 
 ```{r setup}
@@ -39,197 +48,156 @@ This is just one of many possible formulations of a model of adaptation diffusio
 library(ggplot2)
 ```
 
-
-## Structured mixing minority-majority dynamics {#sec-structured-mixing}
-
-
-
 ### Model setup
 
-First, define a function to create a new *minority-majority* model with *structured mixing*. To do that we'll define a helper function, `sample_ingroup()`, that returns a Boolean indicating whether to sample a teacher from its own group, or from
-the majority group. This could be generalized to sample from any one of several outgroups in 
+The main complication in using homophily-structured mixing is that 
+one must have a way to rapidly look up who is in what group in order to
+sample interaction partners. One complication that is shared with alternative
+implementations is setting up who in which group will start with the adaptive
+behavior. 
 
+To take care of the first complication, we leverage
+[`socmod::LearningStrategy`](https://css4s.github.io/socmod/reference/LearningStrategy.html),
+the class that encapsulates the three functions that define how learning works:
+`partner_selection`, `iteration`, and `model_step` functions, which comprise
+the main iteration loop when `run_trial` is used to simulate model dynamics.
+Here is how we define the structured mixing learning strategy, first 
+defining the partner selection function where homophilic, success-biased partner
+selection takes place:
 
+```{r}
+#| eval: false
+# Define partner selection for structured mixing.
+structmix_successbiased_partner_selection <- function(focal_agent, model) {
+  # Extract focal agent's group.
+  group <- focal_agent$get_attribute("Group")
+  # Get homophily attribute from the focal agent.
+  h <- model$get_parameter("homophily")
+  
+  # Use group lookup table to get either in-group or 
+  # out-group prospective teachers.
+  group_lookup <- model$get_parameter("group_lookup")
+  group_names <- names(group_lookup)
 
+  # Prospective teachers stored as vector; from ingroup (if) 
+  # or an outgroup (else)
+  prospective_teachers <- 
+    purrr::list_c(ifelse(
+      sample_ingroup(h), 
+      group_lookup[group], 
+      group_lookup[setdiff(group_names, group)]
+    ))
+  
+  # Select an agent from the prospective teachers weighted by fitness
+  prob_weights <- purrr::map_vec(
+    prospective_teachers, 
+    \(pt) pt$get_fitness()
+  )
+  return (sample(prospective_teachers, 1, prob = prob_weights)[[1]])
+}
 
+# Use our custom structured mixing function above to define the learning
+# strategy for use as the `learning_strategy` for this model's `ModelParameters`.
+structmix_successbiased_strategy <- socmod::LearningStrategy$new(
+  partner_selection = structmix_successbiased_partner_selection,
+  interaction = socmod::success_bias_interact,
+  model_step = socmod::iterate_learning_model,
+  label = "Structured mixing, success-biased"
+)
+```
+In the above snippet, `sample_ingroup` is a function that returns `T` with
+probability `0.5*(1 + homophily)` (and `F` with the complementary probability, `0.5(1 -
+homophily)`). This function is included of the script
+`turner-etal-2023-philtransb/model.R`, which we source below. The snippets 
+above and below are not live in this example.
 
+We now use this partner selection routine in our definition of the full model,
+pasted below. In the function definition we use the 
 
+```{r}
+#| eval: false
+make_minmaj_structmix <- function(n_agents = 100, 
+                                  minority_fraction = 0.05,
+                                  homophily = c(0.0), 
+                                  start_group = "Minority",
+                                  n_to_start = 2,
+                                  social_learning_strategy = 
+                                    structmix_successbiased_strategy,
+                                  adaptive_fitness = 1.4, legacy_fitness = 1.0) {
+  
+  # Set up agents here!
+  n_minority <- round(n_agents * minority_fraction)
+  n_majority <- n_agents - n_minority
+  
+  agents_groups <- c(rep("Minority", n_minority), rep("Majority", n_majority))
+  assertthat::are_equal(length(agents_groups), n_agents)
+  
+  agents <- purrr::imap(
+    agents_groups, \(group, a_idx) {
+      a <- socmod::Agent$new(
+        id = a_idx, 
+        name = paste0("a", a_idx), 
+        behavior = "Legacy", 
+        fitness = legacy_fitness
+      )
 
+      # Currently this returns nothing, so need to set after creation.
+      a$set_attribute("Group", group)
+      
+      return (a)
+    }
+  )
+  
+  group_lookup <- make_group_lookup(agents)
+  assertthat::are_equal(group_lookup$Minority, n_minority)
+  assertthat::are_equal(group_lookup$Majority, n_majority)
+  
+  # Initialize one or two agents with the adaptive behavior.
+  if (start_group == "Both") {
+    
+    min_seed <- sample(group_lookup$Minority, 1)[[1]]
+    maj_seed <- sample(group_lookup$Majority, 1)[[1]]
+    
+    min_seed$set_behavior("Adaptive")
+    maj_seed$set_behavior("Adaptive")
+    min_seed$set_fitness(adaptive_fitness)
+    maj_seed$set_fitness(adaptive_fitness)
+    
+  } else if (start_group %in% c("Minority", "Majority")) {
+    
+    seed <- sample(group_lookup[[start_group]], 1)[[1]]
+    seed$set_behavior("Adaptive")
+    seed$set_fitness(adaptive_fitness)
+    
+  } else {
+    
+    stop("start_group must be 'Minority', 'Majority', or 'Both'")
+  }
+  
+  abm <- socmod::make_abm(
+    model_parameters = socmod::make_model_parameters(
+      learning_strategy = social_learning_strategy,
+      graph = igraph::make_empty_graph(n_agents),
+      n_agents = n_agents,
+      homophily = homophily,
+      start_group = start_group,
+      adaptive_fitness = adaptive_fitness,
+      legacy_fitness = legacy_fitness,
+      group_lookup = group_lookup
+    ),
+    agents = agents
+  )
 
+  return (abm)
+}
+```
 
+```{r}
+#| fig-width: 5
+#| fig-height: 3
+source("model.R")
 
-
-<!-- ```{r} -->
-<!-- sample_ingroup <- function(homophily) { -->
-<!--   # Probability of within-group interaction. -->
-<!--   ingroup_prob <- 0.5 * (1 + homophily) -->
-<!--   # Return if random draw from uniform distribution less than ingroup prob. -->
-<!--   return (runif(1) < ingroup_prob)   -->
-<!-- } -->
-
-<!-- # Define partner selection for structured mixing. -->
-<!-- structmix_successbiased_partner_selection <- function(focal_agent, model) { -->
-<!--   # Extract focal agent's group. -->
-<!--   grp <- focal_agent$get_attribute("Group") -->
-<!--   # Get homophily attribute from the focal agent. -->
-<!--   h <- focal_agent$get_attribute("Homophily") -->
-
-<!--   # Use group lookup table to get either in-group or out-group prospective teachers. -->
-<!--   grp_lookup <- model$get_parameter("group_lookup") -->
-<!--   grp_names <- names(grp_lookup) -->
-
-<!--   # Prospective teachers stored as vector; from ingroup (if) or an outgroup (else) -->
-<!--   prospective_teachers <-  -->
-<!--     purrr::list_c(ifelse( -->
-<!--       sample_ingroup(h), grp_lookup[grp], grp_lookup[setdiff(grp_names, grp)] -->
-<!--     )) -->
-
-<!--   # Select an agent from the prospective teachers weighted by fitness -->
-<!--   prob_weights <- purrr::map_vec(prospective_teachers, \(pt) pt$get_fitness()) -->
-<!--   return (sample(prospective_teachers, 1, prob = prob_weights)[[1]]) -->
-<!-- } -->
-
-<!-- # Use our custom structured mixing  -->
-<!-- structmix_successbiased_strategy <- socmod::LearningStrategy$new( -->
-<!--   partner_selection = structmix_successbiased_partner_selection, -->
-<!--   interaction = socmod::success_bias_interact, -->
-<!--   model_step = socmod::iterate_learning_model, -->
-<!--   label = "Structured mixing, success-biased" -->
-<!-- ) -->
-
-<!-- make_minmaj_structmix <- function(n_agents = 100, minority_fraction = 0.05, -->
-<!--                                   homophily = c(0.0), start_group = "Minority", -->
-<!--                                   social_learning_strategy =  -->
-<!--                                     structmix_successbiased_strategy, -->
-<!--                                   adaptive_fitness = 1.4, legacy_fitness = 1.0) { -->
-
-<!--   # Set up agents here! -->
-<!--   n_minority <- round(n_agents * minority_fraction) -->
-<!--   n_majority <- n_agents - n_minority -->
-<!--   agents_groups <- c(rep("Minority", n_minority), rep("Majority", n_majority)) -->
-<!--   assertthat::are_equal(length(agents_groups), n_agents) -->
-
-<!--   # Initialize agents list with groups -->
-<!--   agents <- purrr::imap_vec( -->
-<!--     agents_groups, \(group, a_idx) { -->
-<!--       socmod::Agent$new( -->
-<!--         id = a_idx, name = paste0("a", a_idx),  -->
-<!--         behavior = "Legacy", fitness = legacy_fitness -->
-<!--       )$set_attribute("Group", group) -->
-<!--     } -->
-<!--   ) -->
-
-<!--   abm <- socmod::make_abm( -->
-<!--     model_parameters = make_model_parameters( -->
-<!--       learning_strategy = social_learning_strategy, graph = igraph::empty_graph(), -->
-<!--       do.call(m(homophily, start_group, adaptive_fitness, legacy_fitness) -->
-<!--     ), -->
-<!--     agents = agents -->
-<!--   ) -->
-
-<!--   return (abm) -->
-<!-- } -->
-
-<!-- ``` -->
-
-
-<!-- Then let's create one model: -->
-
-<!-- ```{r} -->
-<!-- # Let's try making and running one zero-homophily model with 100 agents. -->
-<!-- abm <- make_minmaj_model( -->
-<!--   n_agents = 100, -->
-<!--   homophily = 0.8, -->
-<!--   adaptive_fitness = 1.4, -->
-<!--   minority_fraction = 0.05  # means 5 in the minority group. -->
-<!-- ) -->
-<!-- ``` -->
-
-
-<!-- ### Homphily network -->
-
-<!-- We can visualize the homophily network using the following recipe: -->
-
-<!-- ```{r} -->
-<!-- #| fig-asp: 0.8 -->
-<!-- #| column: margin -->
-
-<!-- # Extract network. -->
-<!-- net <- abm$get_network() -->
-
-<!-- # Visualize groups and network. -->
-<!-- socmod::ggnetplot(net, layout = \(net) 0.6*igraph::layout_in_circle(net)) + -->
-<!--   ggnetwork::geom_edges(linewidth = 0.25, color="darkgray") + -->
-<!--   ggnetwork::geom_nodes(ggplot2::aes(color = group), size = 3) + -->
-<!--   ggnetwork::theme_blank(base_size=25) -->
-<!-- ``` -->
-
-<!-- We see that at a homophily of 0.8 many of the network connections go between members of the majority group, group 2, since the majority accounts for 95% of the population and 90% of its edges connect two majority group members.  -->
-
-<!-- ## Symmetric homophily with undirected social networks -->
-
-<!-- ```{r} -->
-<!-- #' Create a new minority-majority adaptation diffusion model initialized as specified. -->
-<!-- make_minmaj_undirectedsym <- function(n_agents = 100, minority_fraction = 0.05, -->
-<!--                               mean_degree = 4, homophily = c(0.0), -->
-<!--                               social_learning_strategy =  -->
-<!--                                 socmod::success_bias_learning_strategy, -->
-<!--                               adaptive_fitness = 1.4,  -->
-<!--                               start_group = "Minority") { -->
-
-<!--   # Minority groups are defined by the population size in this model. -->
-<!--   minority_size <- ceiling(n_agents * minority_fraction) -->
-<!--   majority_size <- n_agents - minority_size -->
-
-<!--   graph <- socmod::make_homophily_network( -->
-<!--     group_sizes = c( -->
-<!--       minority_size, -->
-<!--       majority_size -->
-<!--     ), -->
-<!--     mean_degree = mean_degree, -->
-<!--     homophily = homophily, -->
-<!--     add_to_complete = TRUE -->
-<!--   ) -->
-
-<!--   # Initialize ABM. -->
-<!--   abm <- socmod::make_abm(socmod::make_model_parameters(graph = graph)) -->
-
-<!--   # It might have already synced the group information as a parameter, let's see. -->
-<!--   # If not I'll have to write that. -->
-<!--   return (abm) -->
-<!-- } -->
-<!-- ``` -->
-
-<!-- ## Directed networks with asymmetric homophily -->
-
-<!-- ```{r} -->
-<!-- #' Create a new minority-majority adaptation diffusion model initialized as specified. -->
-<!-- make_minmaj_directedasymm <- function(n_agents = 100, minority_fraction = 0.05, -->
-<!--                               mean_degree = 4, homophily = c(0.0), -->
-<!--                               social_learning_strategy =  -->
-<!--                                 socmod::success_bias_learning_strategy, -->
-<!--                               adaptive_fitness = 1.4,  -->
-<!--                               start_group = "Minority") { -->
-
-<!--   # Minority groups are defined by the population size in this model. -->
-<!--   minority_size <- ceiling(n_agents * minority_fraction) -->
-<!--   majority_size <- n_agents - minority_size -->
-
-<!--   graph <- socmod::make_homophily_network( -->
-<!--     group_sizes = c( -->
-<!--       minority_size, -->
-<!--       majority_size -->
-<!--     ), -->
-<!--     mean_degree = mean_degree, -->
-<!--     homophily = homophily, -->
-<!--     add_to_complete = TRUE -->
-<!--   ) -->
-
-<!--   # Initialize ABM. -->
-<!--   abm <- socmod::make_abm(socmod::make_model_parameters(graph = graph)) -->
-
-<!--   # It might have already synced the group information as a parameter, let's see. -->
-<!--   # If not I'll have to write that. -->
-<!--   return (abm) -->
-<!-- } -->
-<!-- ``` -->
+abm <- make_minmaj_structmix(adaptive_fitness = 1.2, homophily = 0.5)
+trial <- socmod::run_trial(abm, stop = socmod::fixated)
+socmod::plot_adoption(trial, tracked_behaviors = c("Legacy", "Adaptive"))
+```

@@ -16,10 +16,13 @@ structmix_successbiased_partner_selection <- function(focal_agent, model) {
   # Get homophily attribute from the focal agent.
   h <- model$get_parameter("homophily")
   
-  # Use group lookup table to get either in-group or out-group prospective teachers.
+  # Use group lookup table to get either in-group or 
+  # out-group prospective teachers.
   group_lookup <- model$get_parameter("group_lookup")
   group_names <- names(group_lookup)
-  # Prospective teachers stored as vector; from ingroup (if) or an outgroup (else)
+
+  # Prospective teachers stored as vector; from ingroup (if) 
+  # or an outgroup (else)
   prospective_teachers <- 
     purrr::list_c(ifelse(
       sample_ingroup(h), 
@@ -44,11 +47,14 @@ structmix_successbiased_strategy <- socmod::LearningStrategy$new(
 )
 
 make_group_lookup <- function(agents, groups = c("Minority", "Majority")) {
+  
   return (
     purrr::map(
       purrr::set_names(groups), 
       \(g) { 
-        purrr::keep(agents, \(a) a$get_attribute("Group") == g)
+        purrr::keep(
+          agents, \(a) a$get_attribute("Group") == g
+        )
       }
     )
   )
@@ -128,10 +134,3 @@ make_minmaj_structmix <- function(n_agents = 100,
 
   return (abm)
 }
-
-# Initialize structured mixing ABM.
-abm <- make_minmaj_structmix(adaptive_fitness = 10.0, homophily = 0.7)
-
-trial <- socmod::run_trial(abm, stop = socmod::fixated)
-
-p <- plot_adoption(trial, tracked_behaviors = c("Legacy", "Adaptive"))

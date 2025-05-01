@@ -199,10 +199,26 @@ source("model.R")
 
 abm <- make_minmaj_structmix(adaptive_fitness = 1.2, homophily = 0.5)
 
-trial <- socmod::run_trial(abm, stop = socmod::fixated)
+run_trial_minmaj <- function(abm, stop = socmod::fixated) {
+  trial <- socmod::run_trial(abm, stop = socmod::fixated)
+  
+}
+
+
 
 socmod::plot_adoption(trial, tracked_behaviors = c("Legacy", "Adaptive"))
 ```
+
+This plots adoption for the whole population. It would be good to additional see adoption by group. We need a bit more customization to plot this:
+
+```{r}
+t_obs <- trial$get_observations()
+agent_group_tbl <- 
+t_obs |> 
+  inner_join(companies, by = join_by(company == id))
+head(t_obs)
+```
+
 
 ### Computational experiment
 

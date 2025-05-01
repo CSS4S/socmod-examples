@@ -120,10 +120,10 @@ make_minmaj_structmix <- function(n_agents = 100,
                                   minority_fraction = 0.05,
                                   homophily = c(0.0), 
                                   start_group = "Minority",
-                                  n_to_start = 2,
                                   social_learning_strategy = 
                                     structmix_successbiased_strategy,
-                                  adaptive_fitness = 1.4, legacy_fitness = 1.0) {
+                                  adaptive_fitness = 1.4, 
+                                  legacy_fitness = 1.0) {
   
   # Set up agents here!
   n_minority <- round(n_agents * minority_fraction)
@@ -198,6 +198,27 @@ make_minmaj_structmix <- function(n_agents = 100,
 source("model.R")
 
 abm <- make_minmaj_structmix(adaptive_fitness = 1.2, homophily = 0.5)
+
 trial <- socmod::run_trial(abm, stop = socmod::fixated)
+
 socmod::plot_adoption(trial, tracked_behaviors = c("Legacy", "Adaptive"))
+```
+
+### Computational experiment
+
+
+```{r}
+make_minmaj_structmix_byrow <- function(parameter_list) {
+   
+}
+
+trials <- socmod::run_trials(
+  model_generator = make_minmaj_structmix,
+  n_trials_per_param = 2,
+  stop = 5,
+  adaptive_fitness = 1.2,
+  homophily = c(-0.5, 0.0, 0.5)
+)
+
+print(trials)
 ```

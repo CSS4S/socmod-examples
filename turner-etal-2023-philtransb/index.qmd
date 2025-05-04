@@ -286,31 +286,44 @@ group_prevalence <- function(trial, tracked_behaviors = c("Legacy", "Adaptive"))
 
 gprev <- group_prevalence(trial)
 
-plot_by_group_prevalence <- function(trial) {
-  gprev <- group_prevalence(trial)
-  p <- 
-    dplyr::filter(gprev, Behavior == "Adaptive") %>% 
-      ggplot(aes(x = t, y = Prevalence, color = Group)) + 
-        geom_line(linewidth = 1) + 
-        xlab("Step") +
-        ylab("Prevalence (within group)") +
-        theme_classic(base_size = 12) + 
-        scale_color_brewer(palette = "Set1")
+plot_by_group_prevalence <- function(trial, tracked_behaviors = c("Legacy", "Adaptive")) {
+  
+  # Keep only tracked behaviors.
+  gprev <- 
+    group_prevalence(trial) %>% 
+    dplyr::filter(Behavior %in% tracked_behaviors)
+  
+  p <- NULL
+  if (length(tracked_behaviors) > 1) {
+    p <- 
+      ggplot(gprev, aes(x = t, y = Prevalence, color = Behavior, linetype = Group)) +
+        geom_line(linewidth = 1)
+  } else {
+    p <-  
+      ggplot(gprev, aes(x = t, y = Prevalence, linetype = Group)) +
+        geom_line(linewidth = 1, color = "#008583")
+  }
+    
+  p <- p + 
+    xlab("Step") +
+    ylab("Prevalence (within group)") +
+    theme_classic(base_size = 12) + 
+    scale_color_brewer(palette = "Set1")
   
   return (p)
 }
+# Create and run one simulation trial of the minmaj structmix abm.
+abm <- make_minmaj_structmix(adaptive_fitness = 1.2, homophily = 0.5)
+trial <- socmod::run_trial(abm, stop = socmod::fixated)
+# Plot prevalence for each behavior, with line style indicating group-level prevalence.
+p <- plot_by_group_prevalence(trial, tracked_behaviors = c("Legacy", "Adaptive"))
+print(p)
 ```
 
-### Computational experiment
+While it's interesting to see both behaviors and group membership, it's redundant with just two behaviors. We can specify `tracked_behaviors = "Adaptive"` to only plot the prevalence of the Adaptive behavior
 
 ```{r}
-#| fig-width: 5
-#| fig-height: 3
-abm <- make_minmaj_structmix(adaptive_fitness = 1.2, homophily = 0.5)
-
-trial <- socmod::run_trial(abm, stop = socmod::fixated)
-
-p <- plot_by_group_prevalence(trial)
+p <- plot_by_group_prevalence(trial, tracked_behaviors = "Adaptive")
 print(p)
 ```
 

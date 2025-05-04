@@ -111,14 +111,18 @@ structmix_successbiased_partner_selection <- function(focal_agent, model) {
   group_lookup <- model$get_parameter("group_lookup")
   group_names <- names(group_lookup)
 
-  # Prospective teachers stored as vector; from ingroup (if) 
-  # or an outgroup (else)
+  # Prospective teachers stored as vector; from 
+  # ingroup (if) or an outgroup (else)
   prospective_teachers <- 
-    purrr::list_c(ifelse(
-      sample_ingroup(h), 
-      group_lookup[group], 
-      group_lookup[setdiff(group_names, group)]
-    ))
+    purrr::list_c(
+      ifelse(
+        sample_ingroup(h), 
+        # If T sample within group
+        group_lookup[group], 
+        # Otherwise sample between groups
+        group_lookup[setdiff(group_names, group)]
+      )
+    )
   
   # Select an agent from the prospective teachers weighted by fitness
   prob_weights <- purrr::map_vec(
@@ -129,7 +133,7 @@ structmix_successbiased_partner_selection <- function(focal_agent, model) {
 }
 
 # Use our custom structured mixing function above to define the learning
-# strategy for use as the `learning_strategy` for this model's `ModelParameters`.
+# strategy for use as the `learning_strategy` for this model's `ModelParameters`
 structmix_successbiased_strategy <- socmod::LearningStrategy$new(
   partner_selection = structmix_successbiased_partner_selection,
   interaction = socmod::success_bias_interact,
@@ -174,7 +178,7 @@ make_minmaj_structmix <- function(n_agents = 100,
         fitness = legacy_fitness
       )
 
-      # Currently this returns nothing, so need to set after creation.
+      # Currently this returns nothing, so need to set after creation
       a$set_attribute("Group", group)
       
       return (a)
@@ -185,7 +189,7 @@ make_minmaj_structmix <- function(n_agents = 100,
   assertthat::are_equal(group_lookup$Minority, n_minority)
   assertthat::are_equal(group_lookup$Majority, n_majority)
   
-  # Initialize one or two agents with the adaptive behavior.
+  # Initialize one or two agents with the adaptive behavior
   if (start_group == "Both") {
     
     min_seed <- sample(group_lookup$Minority, 1)[[1]]
@@ -247,7 +251,9 @@ group_prevalence <- function(trial, tracked_behaviors = c("Legacy", "Adaptive"))
   
   n_agents <- trial$model$get_parameters()$n_agents
   
-  groups <- purrr::map_vec(trial$model$agents, ~ .x$get_attribute("Group"))
+  groups <- purrr::map_vec(
+    trial$model$agents, ~ .x$get_attribute("Group")
+  )
   unique_groups <- unique(groups)
   group_counts <- as.list(table(groups))
   
@@ -270,28 +276,32 @@ group_prevalence <- function(trial, tracked_behaviors = c("Legacy", "Adaptive"))
       dplyr::group_by(t, Group, Behavior) %>%
       dplyr::summarise(Count = dplyr::n(), .groups = "drop")
   
-  # Initialize a prevalence column then set according values.
+  # Initialize a prevalence column then set according values
   #
-  # Couldn't get "tidier" versions of this block working to add group-level prevalence.
+  # Couldn't get "tidier" versions of this block working to add group-level prevalence
   ret$Prevalence <- 0.0
   ret[ret$Group == "Majority", ]$Prevalence <- 
     ret[ret$Group == "Majority", ]$Count / group_counts$Majority
   ret[ret$Group == "Minority", ]$Prevalence <- 
     ret[ret$Group == "Minority", ]$Count / group_counts$Minority
   
-  # We make sure that all triples for both Behavior col factors, i.e., there is a 
-  # row for every triple of `t`, `Group`, and `tracked_behaviors`. There is some
-  # magic under the tidy hood that uses knowledge of each triple entry's underlying
-  # factor structure; in this case 
+  # We make sure that all triples for both Behavior col factors, 
+  # i.e., there is a row for every triple of `t`, `Group`, 
+  # and `tracked_behaviors`. There is some magic under the 
+  # tidy hood that uses knowledge of each triple entry's underlying
+  # factor structure. In this case both Group and Behavior are factors,
+  # including the unique Group attributes across all agents and the 
+  # behaviors specified as `tracked_behaviors` for Behavior.
   ret <- tidyr::complete(ret, t, Group, Behavior, 
                          fill = list(Count = 0, Prevalence = 0))
   
   return (ret)
 }
 
+# Use a helper function to summarize the prevalence over groups
 gprev <- group_prevalence(trial)
-
-plot_by_group_prevalence <- function(trial, tracked_behaviors = c("Legacy", "Adaptive")) {
+# Use another to plot group-level (i.e., by-group) pre
+plot_group_level_prevalence <- function(trial, tracked_behaviors = c("Legacy", "Adaptive")) {
   
   # Keep only tracked behaviors.
   gprev <- 
@@ -317,33 +327,21 @@ plot_by_group_prevalence <- function(trial, tracked_behaviors = c("Legacy", "Ada
   
   return (p)
 }
+
 # Create and run one simulation trial of the minmaj structmix abm.
 abm <- make_minmaj_structmix(adaptive_fitness = 1.2, homophily = 0.5)
 trial <- socmod::run_trial(abm, stop = socmod::fixated)
-# Plot prevalence for each behavior, with line style indicating group-level prevalence.
-p <- plot_by_group_prevalence(trial, tracked_behaviors = c("Legacy", "Adaptive"))
+# Plot prevalence for each behavior, with line style 
+# indicating group-level prevalence
+p <- plot_group_level_prevalence(trial, tracked_behaviors = c("Legacy", "Adaptive"))
 print(p)
 ```
 
 While it's interesting to see both behaviors and group membership, it's redundant with just two behaviors. We can specify `tracked_behaviors = "Adaptive"` to only plot the prevalence of the Adaptive behavior
 
 ```{r}
-p <- plot_by_group_prevalence(trial, tracked_behaviors = "Adaptive")
+p <- plot_group_level_prevalence(trial, tracked_behaviors = "Adaptive")
 print(p)
 ```
 
-```{r}
-# make_minmaj_structmix_byrow <- function(parameter_list) {
-#    
-# }
-# 
-# trials <- socmod::run_trials(
-#   model_generator = make_minmaj_structmix,
-#   n_trials_per_param = 2,
-#   stop = 5,
-#   adaptive_fitness = 1.2,
-#   homophily = c(-0.5, 0.0, 0.5)
-# )
-# 
-# print(trials)
-```
+Now that we've explored analyzing time series *observations* of simulated dynamics, let's continue on to calculate success rate *outcomes* 

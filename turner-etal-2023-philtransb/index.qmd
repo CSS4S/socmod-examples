@@ -270,14 +270,19 @@ group_prevalence <- function(trial, tracked_behaviors = c("Legacy", "Adaptive"))
       dplyr::group_by(t, Group, Behavior) %>%
       dplyr::summarise(Count = dplyr::n(), .groups = "drop")
   
-  # Not the prettiest, but it will do to add group-level prevalences. Other
-  # approaches didn't pan out.
-  # 
   # Initialize a prevalence column then set according values.
+  #
+  # Couldn't get "tidier" versions of this block working to add group-level prevalence.
   ret$Prevalence <- 0.0
-  ret[ret$Group == "Majority", ]$Prevalence <- ret[ret$Group == "Majority", ]$Count / group_counts$Majority
-  ret[ret$Group == "Minority", ]$Prevalence <- ret[ret$Group == "Minority", ]$Count / group_counts$Minority
+  ret[ret$Group == "Majority", ]$Prevalence <- 
+    ret[ret$Group == "Majority", ]$Count / group_counts$Majority
+  ret[ret$Group == "Minority", ]$Prevalence <- 
+    ret[ret$Group == "Minority", ]$Count / group_counts$Minority
   
+  # We make sure that all triples for both Behavior col factors, i.e., there is a 
+  # row for every triple of `t`, `Group`, and `tracked_behaviors`. There is some
+  # magic under the tidy hood that uses knowledge of each triple entry's underlying
+  # factor structure; in this case 
   ret <- tidyr::complete(ret, t, Group, Behavior, 
                          fill = list(Count = 0, Prevalence = 0))
   
